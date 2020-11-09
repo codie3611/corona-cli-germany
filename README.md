@@ -2,6 +2,8 @@
 
 CLI for daily corona cases in germany
 
+![Tests](https://github.com/lasso-codie/corona-cli-germany/workflows/Tests/badge.svg?branch=main)
+
 ## Installation
 
 Install the CLI by running the following command in the project folder.
