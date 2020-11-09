@@ -4,7 +4,6 @@ import sys
 from typing import Any, Dict, List
 
 import requests
-import rich
 from rich.console import Console
 from rich.table import Table
 from rich.theme import Theme
@@ -13,7 +12,9 @@ from .version import get_version
 
 
 class APISettings:
-    URL_TEMPLATE = "https://api.covid19api.com/country/germany?from={from_date}&to={to_date}"
+    URL_TEMPLATE = "https://api.covid19api.com/country/germany"
+    "?from={from_date}&to={to_date}"
+
     SOURCE_PAGE = "https://covid19api.com/"
 
 
@@ -36,7 +37,8 @@ def parse_cli_args() -> argparse.Namespace:
                         type=str,
                         required=False,
                         default="",
-                        help="Optional path to a file in which the output will be saved.")
+                        help="Optional path to a file in which "
+                        "the output will be saved.")
 
     if len(sys.argv) < 1:
         CONSOLE.print(parser.format_help())

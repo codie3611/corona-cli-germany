@@ -1,9 +1,8 @@
 
-from corona_cli_germany.mockup.MockServer import MockupServer
 import sys
 from unittest import TestCase
 
-from corona_cli_germany.__main__ import CONSOLE, main, APISettings
+from corona_cli_germany.__main__ import CONSOLE, main
 
 
 class TestMain(TestCase):
