@@ -1,4 +1,4 @@
-# Corona Germany CLI :de:
+# Corona CLI Germany :de:
 
 CLI for daily corona cases in germany
 
