@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import unittest
+
 from setuptools import find_packages, setup
 
-
-def get_version():
-    return "1.0.0"
+from corona_cli_germany.version import get_version
 
 
 def collect_tests():

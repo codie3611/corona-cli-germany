@@ -1,12 +1,48 @@
-import rich
-from rich.table import Table
+import argparse
 import datetime
+import sys
 from typing import Any, Dict, List
-import requests
 
-# API
-URL_TEMPLATE = "https://api.covid19api.com/country/germany?from={from_date}&to={to_date}"
-SOURCE_PAGE = "https://covid19api.com/"
+import requests
+import rich
+from rich.console import Console
+from rich.table import Table
+from rich.theme import Theme
+
+from .version import get_version
+
+
+class APISettings:
+    URL_TEMPLATE = "https://api.covid19api.com/country/germany?from={from_date}&to={to_date}"
+    SOURCE_PAGE = "https://covid19api.com/"
+
+
+# Console
+CONSOLE = Console(theme=Theme({
+    "info": "blue",
+    "success": "green",
+    "warning": "yellow",
+    "error": "bold red"
+}), record=True, highlight=False)
+
+
+def parse_cli_args() -> argparse.Namespace:
+
+    parser = argparse.ArgumentParser(
+        description="Command line utility for daily corona cases in germany.",
+        usage="python -m corona_cli_germany")
+
+    parser.add_argument("--filepath",
+                        type=str,
+                        required=False,
+                        default="",
+                        help="Optional path to a file in which the output will be saved.")
+
+    if len(sys.argv) < 1:
+        CONSOLE.print(parser.format_help())
+        exit(0)
+
+    return parser.parse_args(sys.argv[1:])
 
 
 class CountryCoronaData:
@@ -34,14 +70,16 @@ def fetch_data() -> list:
     """
 
     today = datetime.date.today()
-    a_week_ago = today - datetime.timedelta(days=7)
+    a_week_ago = today - datetime.timedelta(days=3)
 
-    url = URL_TEMPLATE.format(
+    url = APISettings.URL_TEMPLATE.format(
         from_date=a_week_ago.isoformat(),
         to_date=today.isoformat(),
     )
 
     data = requests.get(url)
+
+    print(data.json())
 
     return data.json()
 
@@ -89,13 +127,16 @@ def print_header():
     """ Prints the command line header
     """
 
-    rich.print("""
-              ┌────────────┐
-    [black]Corona[/black]    │ [on black]           [/on black]│
-    [red]Germany[/red]   │ [on #d60000]           [/on #d60000]│
-    [yellow]CLI[/yellow]       │ [on #ffce00]           [/on #ffce00]│
-              └────────────┘
-    """)
+    CONSOLE.print(
+        f"""
+    ┌────────┐
+    │[black]Corona[/black]  │
+    │[red]Germany[/red] │
+    │[yellow]CLI[/yellow]     │
+    ├────────┘
+    │
+    │ Version {get_version()}
+""")
 
 
 def print_data(data: List[CountryCoronaData]):
@@ -103,29 +144,32 @@ def print_data(data: List[CountryCoronaData]):
 
     Parameters
     ----------
-    data : List[CountryCoronaData]
+    data: List[CountryCoronaData]
         data list used for printing
     """
 
     # test for enough data
     if len(data) < 2:
-        msg = "[red]Error: Received not enough data from remote server.[/red]"
-        rich.print(msg)
+        msg = "[red]Received not enough data from remote server.[/red]"
+        CONSOLE.print(msg)
 
     n_new_cases = max(data[-1].confirmed - data[-2].confirmed, 0)
 
     table = Table(show_header=False)
     table.add_row("Last Update", f"[black]{data[-1].date.isoformat()}[/black]")
     table.add_row("New Cases", f"[red]{n_new_cases}[/red]")
-    table.add_row("Source", f"[yellow]{SOURCE_PAGE}[/yellow]")
+    table.add_row("Source", f"[yellow]{APISettings.SOURCE_PAGE}[/yellow]")
 
-    rich.print(table)
-    print()
+    CONSOLE.print(table)
+    CONSOLE.print()
 
 
 def main():
 
     print_header()
+
+    # get command line arguments
+    args = parse_cli_args()
 
     # get the data
     data = fetch_data()
@@ -135,6 +179,9 @@ def main():
 
     # format it
     print_data(parsed_data)
+
+    if args.filepath:
+        CONSOLE.save_html(args.filepath)
 
 
 if __name__ == "__main__":
