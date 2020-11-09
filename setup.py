@@ -25,6 +25,7 @@ def main():
           license="MIT",
           install_requires=[
               "rich",
+              "requests",
           ],
           packages=find_packages(),
           package_data={
