@@ -81,8 +81,6 @@ def fetch_data() -> list:
 
     data = requests.get(url)
 
-    print(data.json())
-
     return data.json()
 
 
