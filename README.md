@@ -4,6 +4,8 @@ CLI for daily corona cases in germany
 
 ## Installation
 
+Install the CLI by running the following command in the project folder.
+
 ```python
 python setup.py install
 ```
