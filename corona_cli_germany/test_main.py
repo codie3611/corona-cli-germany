@@ -1,6 +1,7 @@
 
 import sys
 from unittest import TestCase
+import os
 
 from corona_cli_germany.__main__ import CONSOLE, main, process_data
 from corona_cli_germany.version import get_version
@@ -8,26 +9,26 @@ from corona_cli_germany.version import get_version
 
 class TestMain(TestCase):
 
-    # def setUp(self):
-    #     self.server = MockupServer()
-    #     self.server.start()
+    def test_processing(self):
 
-    #     # overwrite URL to connect to mockup
-    #     APISettings.URL_TEMPLATE = APISettings.URL_TEMPLATE.replace(
-    #         "https://api.covid19api.com", "http://localhost:8080")
-
-    # def tearDown(self) -> None:
-    #     self.server.stop()
-
-    def test_process(self):
-
+        # ground truth printing
+        # rich formatss tables
+        # different on windows and linux
         desired_output = f"""
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Last Update ┃ 2020-11-08              ┃
+│ New Cases   │ 14510                   │
+│ Source      │ https://covid19api.com/ │
+└─────────────┴─────────────────────────┘
+""" if os.name != "nt" else \
+            f"""
 ┌─────────────┬─────────────────────────┐
 │ Last Update │ 2020-11-08              │
 │ New Cases   │ 14510                   │
 │ Source      │ https://covid19api.com/ │
 └─────────────┴─────────────────────────┘
-""".strip()
+"""
+        desired_output = desired_output.strip()
 
         data = [
             {
@@ -45,7 +46,10 @@ class TestMain(TestCase):
                 'Date': '2020-11-08T00:00:00Z'
             }]
 
+        # run main routine without fetching
         process_data(data)
+
+        # get the printed data as string and compare
         text = CONSOLE.export_text().strip()
 
         self.assertEqual(text, desired_output)
