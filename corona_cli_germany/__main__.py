@@ -57,12 +57,12 @@ class CountryCoronaData:
     date: datetime.date
 
 
-def fetch_data() -> list:
+def fetch_data() -> List[dict]:
     """ Query data from the API
 
     Returns
     -------
-    data : dict
+    data : List[dict]
         corona API data
 
     Notes
@@ -164,6 +164,27 @@ def print_data(data: List[CountryCoronaData]):
     CONSOLE.print()
 
 
+def process_data(data: List[dict], filepath: str = ""):
+    """ Processes the data from an API
+
+    Parameters
+    ----------
+    data : list
+        data from the corona API
+    filepath : str
+        optional filepath for saving output
+    """
+
+    # parse it
+    parsed_data = parse_data(data)
+
+    # format it
+    print_data(parsed_data)
+
+    if filepath:
+        CONSOLE.save_html(filepath)
+
+
 def main():
 
     print_header()
@@ -174,14 +195,8 @@ def main():
     # get the data
     data = fetch_data()
 
-    # parse it
-    parsed_data = parse_data(data)
-
-    # format it
-    print_data(parsed_data)
-
-    if args.filepath:
-        CONSOLE.save_html(args.filepath)
+    # process it
+    process_data(data, filepath=args.filepath)
 
 
 if __name__ == "__main__":
