@@ -1,11 +1,9 @@
 
-import sys
 import requests
 from unittest import TestCase
 import os
 
-from corona_cli_germany.__main__ import APISettings, CONSOLE, fetch_data, main, process_data
-from corona_cli_germany.version import get_version
+from corona_cli_germany.__main__ import APISettings, CONSOLE, fetch_data, process_data
 
 
 class TestMain(TestCase):
