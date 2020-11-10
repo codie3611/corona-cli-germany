@@ -1,13 +1,22 @@
 
 import sys
+import requests
 from unittest import TestCase
 import os
 
-from corona_cli_germany.__main__ import CONSOLE, main, process_data
+from corona_cli_germany.__main__ import APISettings, CONSOLE, fetch_data, main, process_data
 from corona_cli_germany.version import get_version
 
 
 class TestMain(TestCase):
+
+    def test_no_connection(self):
+
+        old_url = APISettings.URL_TEMPLATE
+        APISettings.URL_TEMPLATE = "http://i_do_not_exist.wtf"
+        with self.assertRaises(requests.exceptions.ConnectionError):
+            fetch_data()
+        APISettings.URL_TEMPLATE = old_url
 
     def test_processing(self):
 

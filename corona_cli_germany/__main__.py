@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from re import split
 import sys
 from typing import Any, Dict, List
 
@@ -12,10 +13,10 @@ from .version import get_version
 
 
 class APISettings:
-    URL_TEMPLATE = "https://api.covid19api.com/country/germany"
+    URL_TEMPLATE: str = "https://api.covid19api.com/country/germany"
     "?from={from_date}&to={to_date}"
 
-    SOURCE_PAGE = "https://covid19api.com/"
+    SOURCE_PAGE: str = "https://covid19api.com/"
 
 
 # Console
@@ -25,6 +26,45 @@ CONSOLE = Console(theme=Theme({
     "warning": "yellow",
     "error": "bold red"
 }), record=True, highlight=False)
+
+
+def date_from_isoformat(line: str) -> datetime.date:
+    """ Convert a string into a datetime date
+
+    Parameters
+    ----------
+    line : str
+        string containing date in iso format
+
+    Returns
+    -------
+    date : datetime.date
+        date object
+
+    Raises
+    ------
+    ValueError:
+        In case parsing goes wrong.
+    """
+
+    if len(line) < 10:
+        err_msg = "date string must have at least 10 chars"
+        raise ValueError(err_msg)
+
+    splitted_parts = line[:10].split("-")
+    if len(splitted_parts) != 3:
+        err_msg = "Invalid date format: found char '-' {0} times instead of 3."
+        raise ValueError(err_msg)
+
+    if not all(entry.isnumeric() for entry in splitted_parts):
+        err_msg = "Date number is not numeric."
+        raise ValueError(err_msg)
+
+    year = int(splitted_parts[0])
+    month = int(splitted_parts[1])
+    days = int(splitted_parts[2])
+
+    return datetime.date(year, month, days)
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -115,7 +155,7 @@ def parse_data(data_list: List[Dict[str, Any]]) -> List[CountryCoronaData]:
             country_corona_data.recovered = data["Active"]
 
         if "Date" in data:
-            country_corona_data.date = datetime.date.fromisoformat(
+            country_corona_data.date = date_from_isoformat(
                 data["Date"][:10])
 
         parsed_data.append(country_corona_data)
