@@ -222,7 +222,7 @@ def process_data(data: List[dict], filepath: str = ""):
     print_data(parsed_data)
 
     if filepath:
-        CONSOLE.save_html(filepath)
+        CONSOLE.save_text(filepath)
 
 
 def main():

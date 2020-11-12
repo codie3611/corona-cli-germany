@@ -22,6 +22,13 @@ python -m corona_cli_germany
 
 ## Options
 
--  -h, --help           show this help message and exit
--  --filepath FILEPATH  Optional path to a file in which the output will be
-                       saved.
+- -h, --help show this help message and exit
+- --filepath FILEPATH Optional path to a file in which the output will be saved.
+
+## Tests
+
+Run the the test suite as follows:
+
+```bash
+python -m pytest
+```
