@@ -1,6 +1,6 @@
 import argparse
 import datetime
-from re import split
+import os
 import sys
 from typing import Any, Dict, List
 
@@ -222,6 +222,9 @@ def process_data(data: List[dict], filepath: str = ""):
     print_data(parsed_data)
 
     if filepath:
+        dirpath = os.path.dirname(os.path.abspath(filepath))
+        os.makedirs(dirpath, exist_ok=True)
+
         CONSOLE.save_text(filepath)
 
 
