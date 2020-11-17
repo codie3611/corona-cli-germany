@@ -8,7 +8,8 @@ import requests
 from rich.console import Console
 from rich.table import Table
 from rich.theme import Theme
-
+from rich.text import Text
+from rich.panel import Panel
 from .version import get_version
 
 
@@ -19,13 +20,24 @@ class APISettings:
     SOURCE_PAGE: str = "https://covid19api.com/"
 
 
-# Console
-CONSOLE = Console(theme=Theme({
-    "info": "blue",
-    "success": "green",
-    "warning": "yellow",
-    "error": "bold red"
-}), record=True, highlight=False)
+def get_default_console() -> Console:
+    """ Get the default console
+
+    Returns
+    -------
+    console : Console
+        console for printing and logging
+    """
+    return Console(theme=Theme({
+        "info": "blue",
+        "success": "green",
+        "warning": "yellow",
+        "error": "bold red"
+    }), record=True, highlight=False)
+
+
+# Global Console
+CONSOLE = get_default_console()
 
 
 def date_from_isoformat(line: str) -> datetime.date:
@@ -163,23 +175,21 @@ def parse_data(data_list: List[Dict[str, Any]]) -> List[CountryCoronaData]:
     return parsed_data
 
 
-def print_header():
+def get_header() -> str:
     """ Prints the command line header
     """
-
-    CONSOLE.print(
-        f"""
+    return f"""
     ┌────────┐
-    │[black]Corona[/black]  │
-    │[red]Germany[/red] │
-    │[yellow]CLI[/yellow]     │
+    │[black]Corona  [/black]│
+    │[red]Germany [/red]│
+    │[yellow]CLI     [/yellow]│
     ├────────┘
     │
     │ Version {get_version()}
-""")
+"""
 
 
-def print_data(data: List[CountryCoronaData]):
+def format_data(data: List[CountryCoronaData]) -> Table:
     """ Format data into a message
 
     Parameters
@@ -200,37 +210,12 @@ def print_data(data: List[CountryCoronaData]):
     table.add_row("New Cases", f"[red]{n_new_cases}[/red]")
     table.add_row("Source", f"[yellow]{APISettings.SOURCE_PAGE}[/yellow]")
 
-    CONSOLE.print(table)
-    CONSOLE.print()
-
-
-def process_data(data: List[dict], filepath: str = ""):
-    """ Processes the data from an API
-
-    Parameters
-    ----------
-    data : list
-        data from the corona API
-    filepath : str
-        optional filepath for saving output
-    """
-
-    # parse it
-    parsed_data = parse_data(data)
-
-    # format it
-    print_data(parsed_data)
-
-    if filepath:
-        dirpath = os.path.dirname(os.path.abspath(filepath))
-        os.makedirs(dirpath, exist_ok=True)
-
-        CONSOLE.save_text(filepath)
+    return table
 
 
 def main():
 
-    print_header()
+    CONSOLE.print(get_header())
 
     # get command line arguments
     args = parse_cli_args()
@@ -238,8 +223,18 @@ def main():
     # get the data
     data = fetch_data()
 
-    # process it
-    process_data(data, filepath=args.filepath)
+    # process data
+    parsed_data = parse_data(data)
+
+    # format data
+    formatted_data = format_data(parsed_data)
+    CONSOLE.print(formatted_data)
+
+    if args.filepath:
+        dirpath = os.path.dirname(os.path.abspath(args.filepath))
+        os.makedirs(dirpath, exist_ok=True)
+
+        CONSOLE.save_text(args.filepath, styles=False)
 
 
 if __name__ == "__main__":
