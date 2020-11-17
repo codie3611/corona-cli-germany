@@ -26,6 +26,7 @@ def main():
           install_requires=[
               "rich",
               "requests",
+              "flask",
           ],
           packages=find_packages(),
           package_data={
