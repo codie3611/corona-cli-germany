@@ -1,15 +1,13 @@
 
-from corona_cli_germany.version import get_version
 import os
 import sys
 import tempfile
+import time
 from multiprocessing import Process
 from unittest import TestCase
 
-from rich.console import Console
-from rich.table import Table
-
-from corona_cli_germany.__main__ import CONSOLE, APISettings, get_default_console, get_header, main
+from corona_cli_germany.__main__ import (CONSOLE, APISettings,
+                                         get_default_console, get_header, main)
 from corona_cli_germany.mockup.MockupServer import start_mockup_server
 
 
@@ -23,6 +21,9 @@ class TestMain(TestCase):
         self.app_process = Process(
             target=start_mockup_server, kwargs={"port": api_port})
         self.app_process.start()
+
+        # wait until it runs
+        time.sleep(1)
 
         # mockup server address
         APISettings.URL_TEMPLATE = f"http://127.0.0.1:{api_port}/country/germany"

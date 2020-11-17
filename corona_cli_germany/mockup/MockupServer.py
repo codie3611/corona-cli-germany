@@ -39,4 +39,4 @@ def start_mockup_server(port: int):
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-    app.run(port=port)
+    app.run(host="0.0.0.0", port=port)
